@@ -169,7 +169,268 @@ setInterval(()=>{
 },1000);
 
 /* SHOW CODE BUTTON */
-const pythonCode = `PASTE YOUR FINAL PYTHON CODE HERE`;
+const pythonCode = `!pip install -qU google-generativeai==0.8.5 google-ai-generativelanguage==0.6.15 langgraph langchain langchain-google-genai openai
+
+import google.generativeai as genai
+
+genai.configure(api_key="AIzaSyDfiHqnaSdjoEYx7bwhG1yjHm24VA0H69w")
+for model in genai.list_models():
+    print(model.name, model.display_name)
+
+import os
+import getpass
+from langgraph.graph import StateGraph, END
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import HumanMessage
+
+# NEW IMPORTS
+import random
+import uuid
+from datetime import datetime
+
+
+# DOCTOR DATABASE
+doctor_database = {
+    "general": ["Dr. Sharma", "Dr. Patel"],
+    "emergency": ["Dr. Rao"],
+    "mental_health": ["Dr. Mehta"],
+    "cardiology": ["Dr. Kapoor"],
+    "orthopedic": ["Dr. Singh"],
+    "pediatrics": ["Dr. Verma"],
+    "dermatology": ["Dr. Iyer"]
+}
+
+# PATIENT HISTORY DATABASE
+patient_history_db = {}
+
+import os
+import google.generativeai as genai
+
+# Set API key from environment or use Colab user data
+API_KEY = "AIzaSyDfiHqnaSdjoEYx7bwhG1yjHm24VA0H69w"
+os.environ["GOOGLE_API_KEY"] = API_KEY
+genai.configure(api_key=API_KEY)
+
+# Pass the API key explicitly to ChatGoogleGenerativeAI
+llm = ChatGoogleGenerativeAI(
+    model="models/gemini-2.5-flash",  # changed here
+    temperature=0.2,
+    google_api_key=os.environ["GOOGLE_API_KEY"],
+)
+
+def get_symptom(state: dict) -> dict:
+  symptom = input("Welcom to my Hospital,Please enter your symptoms: ")
+  state["symptom"] = symptom #node
+  return state
+
+def classify_symptom(state: dict) -> dict:
+    prompt = f"""
+You are a highly trained hospital triage AI system.
+
+Your task is to classify the patient's symptom into EXACTLY ONE department.
+
+Available Departments:
+
+1. General – Mild symptoms like fever, cold, headache, small injuries.
+2. Emergency – Life-threatening symptoms like chest pain, heavy bleeding, breathing difficulty, unconsciousness.
+3. Mental Health – Anxiety, depression, stress, emotional distress.
+4. Cardiology – Heart-related symptoms like chest tightness, irregular heartbeat.
+5. Orthopedic – Bone, joint, muscle pain, fractures.
+6. Pediatrics – Symptoms specifically related to infants or children.
+7. Dermatology – Skin problems like rashes, itching, infections.
+
+Strict Rules:
+- Choose ONLY ONE department.
+- Respond with EXACT department name.
+- Do NOT explain.
+- Do NOT add extra text.
+- If multiple symptoms exist, prioritize the MOST SEVERE.
+- If life-threatening signs appear, ALWAYS choose Emergency.
+- If unsure, choose the most medically appropriate department.
+
+Patient Symptom:
+\"\"\"{state['symptom']}\"\"\"
+
+Final Answer (One word only):
+"""
+
+    response = llm.invoke([HumanMessage(content=prompt)])
+    state["category"] = response.content.strip()
+    return state
+
+def symptom_router(state: dict) -> str:
+    cat = state["category"].lower().strip()
+
+    if "general" in cat:
+        return "general"
+
+    elif "emergency" in cat:
+        return "emergency"
+
+    elif "mental" in cat:
+        return "mental_health"
+
+    elif "cardiology" in cat:
+        return "cardiology"
+
+    elif "orthopedic" in cat:
+        return "orthopedic"
+
+    elif "pediatrics" in cat:
+        return "pediatrics"
+
+    elif "dermatology" in cat:
+        return "dermatology"
+
+    else:
+        return "general"
+
+def general_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' seems like a general issue. "
+        f"Directing you to the General Ward for consultation."
+    )
+    return state
+
+
+def emergency_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' indicates a medical emergency. "
+        f"Immediate attention is required. Please proceed to Emergency."
+    )
+    return state
+
+
+def mental_health_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' appears to be related to mental health. "
+        f"You are being directed to the Mental Health Department."
+    )
+    return state
+
+
+def cardiology_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' appears heart-related. "
+        f"Directing you to the Cardiology Department."
+    )
+    return state
+
+
+def orthopedic_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' seems related to bones or joints. "
+        f"Directing you to the Orthopedic Department."
+    )
+    return state
+
+
+def pediatrics_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' involves a child patient. "
+        f"Directing you to the Pediatrics Department."
+    )
+    return state
+
+
+def dermatology_node(state: dict) -> dict:
+    state["answer"] = (
+        f"'{state['symptom']}' appears to be a skin-related issue. "
+        f"Directing you to the Dermatology Department."
+    )
+def assign_doctor_node(state: dict) -> dict:
+    ward = state["category"].lower().strip()
+
+    # Generate Patient ID
+    if "patient_id" not in state:
+        state["patient_id"] = str(uuid.uuid4())[:8]
+
+    patient_id = state["patient_id"]
+
+    # Assign doctor
+    doctors = doctor_database.get(ward, ["Dr. Default"])
+    assigned_doctor = random.choice(doctors)
+
+    # Save visit history
+    visit_record = {
+        "symptom": state["symptom"],
+        "department": ward,
+        "doctor": assigned_doctor,
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+
+    if patient_id not in patient_history_db:
+        patient_history_db[patient_id] = []
+
+    patient_history_db[patient_id].append(visit_record)
+
+    # Create history summary
+    history_summary = ""
+    for visit in patient_history_db[patient_id]:
+        history_summary += (
+            f"- {visit['time']} | "
+            f"{visit['department'].capitalize()} | "
+            f"{visit['doctor']}\n"
+        )
+
+    state["answer"] = (
+        f"\n--- HOSPITAL TRIAGE RESULT ---\n"
+        f"Patient ID: {patient_id}\n"
+        f"Symptom: {state['symptom']}\n"
+        f"Department: {ward.capitalize()}\n"
+        f"Doctor Assigned: {assigned_doctor}\n\n"
+        f"--- Patient Visit History ---\n"
+        f"{history_summary}"
+    )
+
+    return state
+
+builder = StateGraph(dict) #BUILDING GRAPH OF NODES
+
+builder.set_entry_point("get_symptom")
+
+builder.add_node("get_symptom",get_symptom)
+builder.add_node("classify",classify_symptom)
+
+builder.add_node("general",general_node)
+builder.add_node("emergency",emergency_node)
+builder.add_node("mental_health",mental_health_node)
+builder.add_node("cardiology",cardiology_node)
+builder.add_node("orthopedic",orthopedic_node)
+builder.add_node("pediatrics",pediatrics_node)
+builder.add_node("dermatology",dermatology_node)
+
+builder.add_node("assign_doctor",assign_doctor_node)
+
+
+#DEFINING EDGES/CONNECTION BETWEEN NODES
+
+builder.add_edge("get_symptom","classify")
+
+builder.add_conditional_edges("classify",symptom_router,{
+    "general":"general",
+    "emergency":"emergency",
+    "mental_health":"mental_health",
+    "cardiology":"cardiology",
+    "orthopedic":"orthopedic",
+    "pediatrics":"pediatrics",
+    "dermatology":"dermatology"
+})
+
+builder.add_edge("general","assign_doctor")
+builder.add_edge("emergency","assign_doctor")
+builder.add_edge("mental_health","assign_doctor")
+builder.add_edge("cardiology","assign_doctor")
+builder.add_edge("orthopedic","assign_doctor")
+builder.add_edge("pediatrics","assign_doctor")
+builder.add_edge("dermatology","assign_doctor")
+
+builder.add_edge("assign_doctor",END)
+
+graph = builder.compile()
+final_state=graph.invoke({})
+print("final Output\n")
+print(final_state["answer"])`;
 
 const btn=document.getElementById("show-code-btn");
 const display=document.getElementById("code-display");
@@ -188,3 +449,4 @@ btn.onclick=()=>{
 
 </body>
 </html>
+
