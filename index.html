@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedTriageAI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:linear-gradient(135deg,#2d1b69 0%,#000 50%,#0c1a1f 100%);
+  color:#d9f7f6;
+  line-height:1.6;
+}
+
+.container{width:90%;max-width:1200px;margin:auto;}
+
+header{padding:20px 0;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-weight:700;font-size:20px;color:#37e2d5;}
+
+nav a{margin-left:20px;text-decoration:none;color:#9fb4b7;}
+nav a:hover{color:#37e2d5;}
+
+.hero{text-align:center;padding:100px 0;}
+.hero h1{font-size:48px;font-weight:700;}
+.hero span{color:#37e2d5;}
+.hero p{margin-top:20px;color:#8ea6a9;}
+
+.btn{margin-top:30px;padding:12px 24px;border-radius:8px;border:none;cursor:pointer;font-weight:600;}
+.btn-primary{background:#1ed7c7;color:#002b2b;}
+.btn-primary:hover{background:#17b5a7;}
+
+.section{padding:80px 0;text-align:center;}
+.section h2{font-size:36px;margin-bottom:40px;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+
+.card{
+  background:linear-gradient(145deg,#2d1b69,#0f1e24,#081318);
+  padding:30px;border-radius:14px;border:1px solid rgba(255,255,255,.05);
+  transition:.3s;
+}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(45,27,105,.3);}
+
+.timeline{display:flex;flex-direction:column;gap:30px;align-items:center;}
+.timeline .step{background:linear-gradient(145deg,#2d1b69,#0f1e24);padding:20px 30px;border-radius:10px;width:300px;}
+
+.team{display:flex;justify-content:center;gap:40px;}
+.member{background:linear-gradient(145deg,#2d1b69,#0f1e24);padding:30px;border-radius:14px;width:250px;}
+
+footer{padding:40px 0;text-align:center;color:#6c8488;}
+
+#timer{
+  position:fixed;bottom:20px;right:20px;
+  background:linear-gradient(145deg,#2d1b69,#000);
+  padding:10px 15px;border-radius:8px;font-weight:600;
+}
+
+#code-display{
+  background:#0f1e24;
+  padding:20px;border-radius:8px;
+  text-align:left;white-space:pre-wrap;
+  font-family:monospace;font-size:12px;
+  max-height:400px;overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<header class="container">
+  <div class="logo">MedTriageAI v1.0</div>
+  <nav>
+    <a href="#problem">Problem</a>
+    <a href="#solution">Solution</a>
+    <a href="#features">Features</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#tech">Tech</a>
+    <a href="#team">Team</a>
+    <a href="#view-code">View Code</a>
+  </nav>
+</header>
+
+<section class="hero container">
+  <h1>AI Powered Medical <span>Symptom Triage</span></h1>
+  <p>Intelligent symptom analysis and automated doctor assignment using LLMs.</p>
+</section>
+
+<section id="problem" class="section container">
+  <h2>Problem Statement</h2>
+  <div class="cards">
+    <div class="card"><h3>Hospital Overload</h3></div>
+    <div class="card"><h3>Long Wait Times</h3></div>
+    <div class="card"><h3>Triage Inconsistency</h3></div>
+  </div>
+</section>
+
+<section id="solution" class="section container">
+  <h2>Solution Overview</h2>
+  <div class="cards">
+    <div class="card"><h3>AI Analysis</h3></div>
+    <div class="card"><h3>Smart Classification</h3></div>
+    <div class="card"><h3>Doctor Matching</h3></div>
+  </div>
+</section>
+
+<section id="features" class="section container">
+  <h2>Key Features</h2>
+  <div class="cards">
+    <div class="card"><h3>Symptom Understanding</h3></div>
+    <div class="card"><h3>Case Classification</h3></div>
+    <div class="card"><h3>Doctor Assignment</h3></div>
+    <div class="card"><h3>Patient Routing</h3></div>
+  </div>
+</section>
+
+<section id="workflow" class="section container">
+  <h2>System Workflow</h2>
+  <div class="timeline">
+    <div class="step">Patient Input</div>
+    <div class="step">AI Interpretation</div>
+    <div class="step">Classification</div>
+    <div class="step">Doctor Mapping</div>
+    <div class="step">Response Generation</div>
+  </div>
+</section>
+
+<section id="tech" class="section container">
+  <h2>Technology Stack</h2>
+  <div class="cards">
+    <div class="card">Google Gemini</div>
+    <div class="card">LangChain</div>
+    <div class="card">LangGraph</div>
+    <div class="card">Python</div>
+  </div>
+</section>
+
+<section id="team" class="section container">
+  <h2>Our Team</h2>
+  <div class="team">
+    <div class="member"><h3>Ashok Kumar Saini</h3><p>Project Guide</p></div>
+    <div class="member"><h3>Siddharth Jha</h3><p>Developer</p></div>
+  </div>
+</section>
+
+<section id="view-code" class="section container">
+  <h2>Backend Code (v1.0)</h2>
+  <button id="show-code-btn" class="btn btn-primary">Show Code</button>
+  <pre id="code-display" style="display:none;"></pre>
+</section>
+
+<div id="timer">00:00:00</div>
+
+<footer>© 2026 MedTriageAI</footer>
+
+<script>
+/* TIMER */
+let seconds=0;
+setInterval(()=>{
+  seconds++;
+  const h=String(Math.floor(seconds/3600)).padStart(2,'0');
+  const m=String(Math.floor((seconds%3600)/60)).padStart(2,'0');
+  const s=String(seconds%60).padStart(2,'0');
+  document.getElementById('timer').textContent=`${h}:${m}:${s}`;
+},1000);
+
+/* SHOW CODE BUTTON */
+const pythonCode = `PASTE YOUR FINAL PYTHON CODE HERE`;
+
+const btn=document.getElementById("show-code-btn");
+const display=document.getElementById("code-display");
+
+btn.onclick=()=>{
+  if(display.style.display==="none"){
+    display.style.display="block";
+    display.textContent=pythonCode;
+    btn.textContent="Hide Code";
+  }else{
+    display.style.display="none";
+    btn.textContent="Show Code";
+  }
+};
+</script>
+
+</body>
+</html>
